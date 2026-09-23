@@ -26,16 +26,16 @@
 #include "sensor_msgs/msg/image.hpp"
 #include "tf2/LinearMath/Quaternion.hpp"
 #include "tf2/LinearMath/Matrix3x3.hpp"
-#include "tf2_ros/transform_broadcaster.h"
+#include "tf2_ros/transform_broadcaster.hpp"
 #include "opencv2/opencv.hpp"
 #include "opencv2/imgproc/imgproc.hpp"
 #include "cv_bridge/cv_bridge.hpp"
 #include "image_geometry/pinhole_camera_model.hpp"
 #include "image_transport/image_transport.hpp"
 #include "image_transport/subscriber_filter.hpp"
-#include "message_filters/subscriber.h"
-#include "message_filters/synchronizer.h"
-#include "message_filters/sync_policies/exact_time.h"
+#include "message_filters/subscriber.hpp"
+#include "message_filters/synchronizer.hpp"
+#include "message_filters/sync_policies/exact_time.hpp"
 
 using std::placeholders::_1;
 using std::placeholders::_2;
@@ -47,9 +47,9 @@ public:
   ImageSubscriber()
   : Node("color_detection")
   {
-    color_sub_.subscribe(this, "/head_camera/color/image_raw", "raw");
-    depth_sub_.subscribe(this, "/head_camera/aligned_depth_to_color/image_raw", "raw");
-    info_sub_.subscribe(this, "/head_camera/color/camera_info");
+    color_sub_.subscribe(*this, "/head_camera/color/image_raw", "raw", rclcpp::QoS(10));
+    depth_sub_.subscribe(*this, "/head_camera/aligned_depth_to_color/image_raw", "raw", rclcpp::QoS(10));
+    info_sub_.subscribe(*this, "/head_camera/color/camera_info", rclcpp::QoS(10));
 
     sync_ = std::make_unique<message_filters::Synchronizer<ExactPolicy>>(
       ExactPolicy(10), color_sub_, depth_sub_, info_sub_);

@@ -127,56 +127,56 @@ def generate_launch_description():
         package='controller_manager',
         executable='ros2_control_node',
         output='screen',
-        parameters=[sciurus17_controllers],
+        parameters=[{'robot_description': loaded_description}, sciurus17_controllers],
     )
 
     spawn_joint_state_broadcaster = Node(
         package='controller_manager',
         executable='spawner',
         output='screen',
-        arguments=['joint_state_broadcaster'],
+        arguments=['joint_state_broadcaster', '--param-file', sciurus17_controllers],
     )
 
     spawn_right_arm_controller = Node(
         package='controller_manager',
         executable='spawner',
         output='screen',
-        arguments=['right_arm_controller'],
+        arguments=['right_arm_controller', '--param-file', sciurus17_controllers],
     )
 
     spawn_right_gripper_controller = Node(
         package='controller_manager',
         executable='spawner',
         output='screen',
-        arguments=['right_gripper_controller'],
+        arguments=['right_gripper_controller', '--param-file', sciurus17_controllers],
     )
 
     spawn_left_arm_controller = Node(
         package='controller_manager',
         executable='spawner',
         output='screen',
-        arguments=['left_arm_controller'],
+        arguments=['left_arm_controller', '--param-file', sciurus17_controllers],
     )
 
     spawn_left_gripper_controller = Node(
         package='controller_manager',
         executable='spawner',
         output='screen',
-        arguments=['left_gripper_controller'],
+        arguments=['left_gripper_controller', '--param-file', sciurus17_controllers],
     )
 
     spawn_neck_controller = Node(
         package='controller_manager',
         executable='spawner',
         output='screen',
-        arguments=['neck_controller'],
+        arguments=['neck_controller', '--param-file', sciurus17_controllers],
     )
 
     spawn_waist_yaw_controller = Node(
         package='controller_manager',
         executable='spawner',
         output='screen',
-        arguments=['waist_yaw_controller'],
+        arguments=['waist_yaw_controller', '--param-file', sciurus17_controllers],
     )
 
     return LaunchDescription(

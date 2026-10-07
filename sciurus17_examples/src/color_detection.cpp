@@ -48,7 +48,8 @@ public:
   : Node("color_detection")
   {
     color_sub_.subscribe(*this, "/head_camera/color/image_raw", "raw", rclcpp::QoS(10));
-    depth_sub_.subscribe(*this, "/head_camera/aligned_depth_to_color/image_raw", "raw", rclcpp::QoS(10));
+    depth_sub_.subscribe(*this, "/head_camera/aligned_depth_to_color/image_raw", "raw",
+      rclcpp::QoS(10));
     info_sub_.subscribe(*this, "/head_camera/color/camera_info", rclcpp::QoS(10));
 
     sync_ = std::make_unique<message_filters::Synchronizer<ExactPolicy>>(

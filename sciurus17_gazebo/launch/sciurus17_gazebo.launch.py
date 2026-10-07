@@ -27,11 +27,11 @@ from sciurus17_description.robot_description_loader import RobotDescriptionLoade
 
 
 def generate_launch_description():
-    
+
     sciurus17_controllers = os.path.join(
         get_package_share_directory('sciurus17_control'), 'config', 'sciurus17_controllers.yaml'
     )
-    
+
     declare_use_head_camera = DeclareLaunchArgument(
         'use_head_camera', default_value='true', description='Use head camera.'
     )

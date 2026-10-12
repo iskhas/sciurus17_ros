@@ -1,4 +1,7 @@
-cmake_minimum_required(VERSION 3.5)
+cmake_minimum_required(VERSION 3.20)
+if(POLICY CMP0167)
+  cmake_policy(SET CMP0167 NEW)
+endif()
 project(sciurus17_examples)
 
 # Default to C99
@@ -6,9 +9,9 @@ if(NOT CMAKE_C_STANDARD)
   set(CMAKE_C_STANDARD 99)
 endif()
 
-# Default to C++17
+# Default to C++20
 if(NOT CMAKE_CXX_STANDARD)
-  set(CMAKE_CXX_STANDARD 17)
+  set(CMAKE_CXX_STANDARD 20)
 endif()
 
 if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
@@ -26,6 +29,9 @@ find_package(image_transport REQUIRED)
 find_package(message_filters REQUIRED)
 find_package(moveit_ros_planning_interface REQUIRED)
 find_package(OpenCV REQUIRED COMPONENTS core)
+find_package(jsoncpp REQUIRED)
+find_package(VTK REQUIRED)
+find_package(PCL REQUIRED)
 find_package(pcl_conversions REQUIRED)
 find_package(pcl_ros REQUIRED)
 find_package(rclcpp REQUIRED)
@@ -47,19 +53,21 @@ foreach(loop_var IN LISTS components_list)
     src/${loop_var}.cpp)
   target_compile_definitions(${loop_var}
     PRIVATE "COMPOSITION_BUILDING_DLL")
-  ament_target_dependencies(${loop_var}
-    angles
-    rclcpp_components
-    rclcpp_action
-    cv_bridge
-    geometry_msgs
-    image_geometry
-    image_transport
-    message_filters
-    OpenCV
-    rclcpp
-    tf2_ros
-    control_msgs)
+  target_include_directories(${loop_var} PRIVATE
+    ${OpenCV_INCLUDE_DIRS})
+  target_link_libraries(${loop_var} PRIVATE
+    angles::angles
+    rclcpp_components::component
+    rclcpp_action::rclcpp_action
+    cv_bridge::cv_bridge
+    geometry_msgs::geometry_msgs
+    image_geometry::image_geometry
+    image_transport::image_transport
+    message_filters::message_filters
+    ${OpenCV_LIBRARIES}
+    rclcpp::rclcpp
+    tf2_ros::tf2_ros
+    control_msgs::control_msgs)
 endforeach()
 
 rclcpp_components_register_nodes(color_detection_2d "sciurus17_examples::ColorDetection2D")
@@ -89,11 +97,11 @@ target_include_directories(
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
   $<INSTALL_INTERFACE:include>
 )
-ament_target_dependencies(
+target_link_libraries(
   ${LIBRARY_NAME}
-  angles
-  geometry_msgs
-  tf2_geometry_msgs
+  angles::angles
+  geometry_msgs::geometry_msgs
+  tf2_geometry_msgs::tf2_geometry_msgs
 )
 
 ament_export_targets(export_${LIBRARY_NAME} HAS_LIBRARY_TARGET)
@@ -133,22 +141,28 @@ set(executable_list
 )
 foreach(loop_var IN LISTS executable_list)
   add_executable(${loop_var} src/${loop_var}.cpp)
-  target_link_libraries(${loop_var} ${LIBRARY_NAME})
-  ament_target_dependencies(${loop_var}
-    rclcpp_action
-    cv_bridge
-    geometry_msgs
-    image_geometry
-    image_transport
-    message_filters
-    moveit_ros_planning_interface
-    OpenCV
-    pcl_ros
-    pcl_conversions
-    rclcpp
-    tf2_ros
-    tf2_geometry_msgs
-    control_msgs
+  target_include_directories(${loop_var} PRIVATE
+    ${OpenCV_INCLUDE_DIRS}
+    ${pcl_ros_INCLUDE_DIRS}
+    ${PCL_INCLUDE_DIRS}
+  )
+  target_link_libraries(${loop_var} PRIVATE
+    ${LIBRARY_NAME}
+    ${OpenCV_LIBRARIES}
+    ${PCL_LIBRARIES}
+    ${pcl_ros_LIBRARIES}
+    rclcpp_action::rclcpp_action
+    cv_bridge::cv_bridge
+    geometry_msgs::geometry_msgs
+    image_geometry::image_geometry
+    image_transport::image_transport
+    message_filters::message_filters
+    moveit_ros_planning_interface::moveit_ros_planning_interface
+    pcl_conversions::pcl_conversions
+    rclcpp::rclcpp
+    tf2_ros::tf2_ros
+    tf2_geometry_msgs::tf2_geometry_msgs
+    control_msgs::control_msgs
   )
 
   install(TARGETS

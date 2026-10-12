@@ -28,7 +28,7 @@
 #include "opencv2/aruco.hpp"
 #include "opencv2/core/quaternion.hpp"
 #include "cv_bridge/cv_bridge.hpp"
-#include "tf2_ros/transform_broadcaster.h"
+#include "tf2_ros/transform_broadcaster.hpp"
 #include "image_transport/image_transport.hpp"
 #include "image_transport/camera_subscriber.hpp"
 
@@ -42,14 +42,17 @@ public:
   : Node("aruco_detection")
   {
     camera_subscription_ = image_transport::create_camera_subscription(
-      this,
+      *this,
       "/head_camera/color/image_raw",
       std::bind(&ImageSubscriber::camera_callback, this, _1, _2),
-      "raw");
+      "raw",
+      rclcpp::QoS(10));
 
     // ArUcoマーカのデータセットを読み込む
     // DICT_6x6_50は6x6ビットのマーカが50個収録されたもの
-    marker_dict_ = cv::aruco::getPredefinedDictionary(cv::aruco::DICT_6X6_50);
+    marker_dict_ =
+      cv::makePtr<cv::aruco::Dictionary>(cv::aruco::getPredefinedDictionary(
+      cv::aruco::DICT_6X6_50));
 
     tf_broadcaster_ =
       std::make_unique<tf2_ros::TransformBroadcaster>(*this);
